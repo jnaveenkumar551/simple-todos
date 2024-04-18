@@ -1,56 +1,70 @@
-import {useState} from 'react'
-
+// Write your code here
+import {Component} from 'react'
 import './index.css'
 
-const TodoItem = props => {
-  const {todoDetails, deleteTodo, saveTodo} = props
-  const {id, title} = todoDetails
+class TodoItem extends Component {
+  state = {data: '', value: 'edit', checked: false}
 
-  const [isSaved, setIsSaved] = useState(true)
-  const [newTitle, setNewTitle] = useState(title)
+  componentDidMount = () => {
+    const {todoList} = this.props
+    const {title} = todoList
+    this.setState({data: title})
+  }
 
-  const onDeleteTodo = () => {
+  checkBox = () => {
+    this.setState(prevState => ({
+      checked: !prevState.checked,
+    }))
+  }
+
+  changeValue = () => {
+    const {value} = this.state
+    if (value === 'save') {
+      this.setState({value: 'edit'})
+    } else {
+      this.setState({value: 'save'})
+    }
+  }
+
+  changeTitle = event => {
+    this.setState({data: event.target.value})
+  }
+
+  onDelete = () => {
+    const {todoList, deleteTodo} = this.props
+    const {id} = todoList
     deleteTodo(id)
   }
 
-  const onSaveTodo = () => {
-    setIsSaved(true)
-    saveTodo({id, title: newTitle})
+  render() {
+    const {value, data} = this.state
+    const data1 = value === 'edit' ? 'Edit' : 'Save'
+    const {checked} = this.state
+    const classN = checked === true ? 'checked' : ''
+    return (
+      <li className="item">
+        <input type="checkbox" onChange={this.checkBox} />
+        {value === 'edit' ? (
+          <p className={classN}>{data}</p>
+        ) : (
+          <input
+            type="text"
+            value={data}
+            className="inputEl"
+            onChange={this.changeTitle}
+          />
+        )}
+        <div>
+          <button type="button" className="button" onClick={this.changeValue}>
+            {data1}
+          </button>
+          <button type="button" className="button" onClick={this.onDelete}>
+            Delete
+          </button>
+        </div>
+      </li>
+    )
   }
-
-  const onEditClick = () => setIsSaved(false)
-
-  const onChangeHandler = event => setNewTitle(event.target.value)
-
-  return (
-    <li className="todo-item">
-      {isSaved ? (
-        <p className="title">{title}</p>
-      ) : (
-        <input className="title" value={newTitle} onChange={onChangeHandler} />
-      )}
-      {isSaved ? (
-        <button
-          type="button"
-          className="delete-btn edit-btn"
-          onClick={onEditClick}
-        >
-          Edit
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="delete-btn save-btn"
-          onClick={onSaveTodo}
-        >
-          Save
-        </button>
-      )}
-      <button type="button" className="delete-btn" onClick={onDeleteTodo}>
-        Delete
-      </button>
-    </li>
-  )
 }
 
 export default TodoItem

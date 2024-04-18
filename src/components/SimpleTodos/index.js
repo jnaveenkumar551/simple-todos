@@ -1,110 +1,104 @@
 import {Component} from 'react'
 
-import {v4 as uuidV4} from 'uuid'
-
-import TodoItem from '../TodoItem'
+import {v4 as uuidv4} from 'uuid'
 
 import './index.css'
 
+import TodoItem from '../TodoItem/index'
+
 const initialTodosList = [
   {
-    id: uuidV4(),
+    id: 1,
     title: 'Book the ticket for today evening',
   },
   {
-    id: uuidV4(),
+    id: 2,
     title: 'Rent the movie for tomorrow movie night',
   },
   {
-    id: uuidV4(),
+    id: 3,
     title: 'Confirm the slot for the yoga session tomorrow morning',
   },
   {
-    id: uuidV4(),
+    id: 4,
     title: 'Drop the parcel at Bloomingdale',
   },
   {
-    id: uuidV4(),
+    id: 5,
     title: 'Order fruits on Big Basket',
   },
   {
-    id: uuidV4(),
+    id: 6,
     title: 'Fix the production issue',
   },
   {
-    id: uuidV4(),
+    id: 7,
     title: 'Confirm my slot for Saturday Night',
   },
   {
-    id: uuidV4(),
+    id: 8,
     title: 'Get essentials for Sunday car wash',
   },
 ]
 
 class SimpleTodos extends Component {
-  state = {
-    todosList: initialTodosList,
-    titleInput: '',
+  state = {todosList: initialTodosList, value: ''}
+
+  updateItem = event => {
+    const data = event.target.value
+    this.setState({value: data})
   }
 
-  renderTodoInputField = () => {
-    const {titleInput} = this.state
-
-    const onChangeHandler = event => {
-      this.setState({titleInput: event.target.value})
+  addItem = () => {
+    const {value, todosList} = this.state
+    const array = value.split(' ')
+    const lengths = array.length
+    if (value !== '') {
+      let number = array.slice(lengths - 1, lengths)
+      number = parseInt(number)
+      let text = array.slice(0, lengths - 1)
+      text = text.join(' ')
+      let i = 0
+      let newInitialTodosList = [...todosList]
+      while (i < number) {
+        const option = {id: uuidv4(), title: text}
+        newInitialTodosList = [...newInitialTodosList, option]
+        i += 1
+      }
+      this.setState({value: '', todosList: newInitialTodosList})
     }
-
-    const onAddTodo = () => {
-      if (titleInput === '') return
-
-      this.setState(prevState => ({
-        todosList: [...prevState.todosList, {id: uuidV4(), title: titleInput}],
-        titleInput: '',
-      }))
-    }
-
-    return (
-      <div className="title-input-container">
-        <input value={titleInput} onChange={onChangeHandler} />
-        <button className="add-btn" type="button" onClick={onAddTodo}>
-          Add
-        </button>
-      </div>
-    )
   }
 
   deleteTodo = id => {
     const {todosList} = this.state
-    const updatedTodosList = todosList.filter(eachTodo => eachTodo.id !== id)
-
-    this.setState({
-      todosList: updatedTodosList,
-    })
-  }
-
-  saveTodo = task => {
-    this.setState(prevState => ({
-      todosList: prevState.todosList.map(item =>
-        item.id === task.id ? task : item,
-      ),
-    }))
+    const filteredTodosList = todosList.filter(each => each.id !== id)
+    this.setState({todosList: filteredTodosList})
   }
 
   render() {
-    const {todosList} = this.state
-
+    const {todosList, value} = this.state
+    console.log(todosList)
     return (
-      <div className="app-container">
-        <div className="simple-todos-container">
+      <div className="container">
+        <div className="card">
           <h1 className="heading">Simple Todos</h1>
-          {this.renderTodoInputField()}
-          <ul className="todos-list">
+          <div className="input">
+            <input
+              type="text"
+              className="inputElement"
+              value={value}
+              onChange={this.updateItem}
+            />
+            <button type="button" className="buttonAdd" onClick={this.addItem}>
+              Add
+            </button>
+          </div>
+          <ul>
             {todosList.map(eachTodo => (
               <TodoItem
                 key={eachTodo.id}
-                todoDetails={eachTodo}
+                todoList={eachTodo}
                 deleteTodo={this.deleteTodo}
-                saveTodo={this.saveTodo}
               />
             ))}
           </ul>
@@ -113,5 +107,4 @@ class SimpleTodos extends Component {
     )
   }
 }
-
 export default SimpleTodos
